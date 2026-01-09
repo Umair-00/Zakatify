@@ -15,7 +15,7 @@ namespace ZakatifyApi.Controllers
         {
             _configuration = configuration;
             
-            var url = _configuration["Supabase:Url"];
+            var url = _configuration["Supabase:Url"] ?? throw new System.ArgumentNullException("Supabase:Url", "Supabase URL must be configured (Supabase:Url).");
             var key = _configuration["Supabase:ServiceRoleKey"];
             
             var options = new SupabaseOptions
