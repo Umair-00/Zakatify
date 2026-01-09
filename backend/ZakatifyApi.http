@@ -1,0 +1,6 @@
+@ZakatifyApi_HostAddress = http://localhost:5102
+
+GET {{ZakatifyApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

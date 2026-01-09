@@ -1,0 +1,54 @@
+<div class="login-container">
+  <div class="login-card">
+    <!-- Logo/Branding -->
+    <div class="brand">
+      <h1 class="logo">Zakatify</h1>
+      <p class="tagline">Calculate your zakat with confidence</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Login Form -->
+    <form (ngSubmit)="onSubmit($event)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Enter your email"
+          [disabled]="isLoading"
+        />
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Enter your password"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <button type="submit" class="login-btn" [disabled]="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <div class="form-links">
+        <a href="#" class="link">Forgot Password?</a>
+        <span class="separator">•</span>
+        <a routerLink="/signup" class="link">Create Account</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Decorative Islamic Pattern -->
+  <div class="pattern-decoration"></div>
+</div>

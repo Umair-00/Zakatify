@@ -1,0 +1,70 @@
+<div class="signup-container">
+  <div class="signup-card">
+    <!-- Logo/Branding -->
+    <div class="brand">
+      <h1 class="logo">Zakatify</h1>
+      <p class="tagline">Create your account</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <!-- Signup Form -->
+    <form (ngSubmit)="onSubmit($event)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Enter your email"
+          [disabled]="isLoading"
+        />
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Enter your password"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          placeholder="Confirm your password"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <button type="submit" class="signup-btn" [disabled]="isLoading">
+        {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+      </button>
+
+      <div class="form-links">
+        <span>Already have an account?</span>
+        <a routerLink="/login" class="link">Login</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Decorative Islamic Pattern -->
+  <div class="pattern-decoration"></div>
+</div>
