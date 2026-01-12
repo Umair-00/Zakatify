@@ -1,0 +1,67 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1 class="welcome-title">Welcome back, {{ userName() }} <span aria-hidden="true">👋</span></h1>
+    <p class="welcome-subtitle">Let's complete your zakat calculation for 1446 AH</p>
+  </header>
+
+  <div class="stats-row">
+    <article class="stat-card stat-card--blue">
+      <div class="stat-header">
+        <span class="stat-label">Total Assets</span>
+      </div>
+      <p class="stat-value">{{ stats().totalAssets | currency:'USD':'symbol':'1.0-0' }}</p>
+      <p class="stat-change stat-change--positive">
+        <span aria-hidden="true">↑</span> {{ stats().percentageChange }}% from last year
+      </p>
+    </article>
+
+    <article class="stat-card stat-card--orange">
+      <div class="stat-header">
+        <span class="stat-label">Estimated Zakat</span>
+      </div>
+      <p class="stat-value">{{ stats().estimatedZakat | currency:'USD':'symbol':'1.0-0' }}</p>
+      <p class="stat-info">2.5% of zakatable assets</p>
+    </article>
+  </div>
+
+  <article class="due-card">
+    <div class="due-header">
+      <span class="due-label">Days Until Due</span>
+    </div>
+    <p class="due-value">{{ stats().daysUntilDue }}</p>
+    <p class="due-date">Due: {{ stats().dueDate }}</p>
+  </article>
+
+  <section class="progress-card" aria-labelledby="progress-title">
+    <div class="progress-header">
+      <h2 id="progress-title" class="progress-title">Your Calculation Progress</h2>
+      <span class="progress-percentage">{{ calculationProgress() }}%</span>
+    </div>
+    <div class="progress-steps" role="list" aria-label="Calculation steps progress">
+      @for (step of calculationSteps(); track step.id) {
+        <div class="progress-step" role="listitem">
+          <div
+            class="step-bar"
+            [class.step-bar--completed]="step.completed"
+            [attr.aria-label]="step.label + (step.completed ? ' completed' : ' not completed')"
+          ></div>
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="action-cards">
+    <button type="button" class="action-card" (click)="continueCalculation()">
+      <div class="action-icon" aria-hidden="true">📝</div>
+      <h3 class="action-title">Continue Calculation</h3>
+      <p class="action-description">Pick up where you left off and complete your zakat calculation.</p>
+    </button>
+
+    <button type="button" class="action-card" (click)="manageJewelry()">
+      <div class="action-icon" aria-hidden="true">💎</div>
+      <h3 class="action-title">Manage Jewelry</h3>
+      <p class="action-description">Update your jewelry collection with current values and items.</p>
+    </button>
+  </div>
+</div>

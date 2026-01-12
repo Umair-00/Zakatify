@@ -1,0 +1,54 @@
+<div class="app-layout">
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <h1 class="logo">Zakatify</h1>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (section of navSections(); track section.title) {
+        <div class="nav-section">
+          <span class="nav-section-title">{{ section.title }}</span>
+          <ul class="nav-list">
+            @for (item of section.items; track item.route) {
+              <li>
+                <a
+                  [routerLink]="item.route"
+                  routerLinkActive="active"
+                  class="nav-item"
+                  [attr.aria-current]="null"
+                >
+                  <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+                  <span class="nav-label">{{ item.label }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar" aria-hidden="true">
+          {{ userInitials() }}
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ userName() }}</span>
+          <span class="user-email">{{ userEmail() }}</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="logout-btn"
+        (click)="onLogout()"
+        aria-label="Log out of your account"
+      >
+        Log out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content" role="main">
+    <router-outlet />
+  </main>
+</div>
