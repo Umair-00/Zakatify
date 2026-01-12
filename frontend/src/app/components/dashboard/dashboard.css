@@ -1,0 +1,249 @@
+.dashboard {
+  max-width: 900px;
+}
+
+/* Header */
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border-top: 4px solid transparent;
+}
+
+.stat-card--blue {
+  border-top-color: var(--accent-blue);
+}
+
+.stat-card--orange {
+  border-top-color: var(--accent-orange);
+}
+
+.stat-header {
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.stat-change {
+  font-size: 14px;
+  margin: 0;
+}
+
+.stat-change--positive {
+  color: var(--primary-green);
+}
+
+.stat-info {
+  font-size: 14px;
+  color: var(--accent-orange);
+  margin: 0;
+}
+
+/* Due Card */
+.due-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border-top: 4px solid var(--accent-purple);
+  margin-bottom: 24px;
+  max-width: calc(50% - 12px);
+}
+
+.due-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.due-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 8px 0;
+  line-height: 1;
+}
+
+.due-date {
+  font-size: 14px;
+  color: var(--primary-green);
+  margin: 0;
+}
+
+/* Progress Card */
+.progress-card {
+  background: var(--primary-green);
+  border-radius: var(--border-radius);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.progress-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.progress-percentage {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  opacity: 0.95;
+}
+
+.progress-steps {
+  display: flex;
+  gap: 16px;
+}
+
+.progress-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.step-bar--completed {
+  background: white;
+}
+
+.step-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+/* Action Cards */
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.action-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--sidebar-border);
+  text-align: left;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.action-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.action-card:focus {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 2px;
+}
+
+.action-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--main-bg);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.action-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.action-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-row,
+  .action-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .due-card {
+    max-width: 100%;
+  }
+
+  .progress-steps {
+    flex-wrap: wrap;
+  }
+
+  .progress-step {
+    flex: 0 0 calc(50% - 8px);
+  }
+
+  .welcome-title {
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+}

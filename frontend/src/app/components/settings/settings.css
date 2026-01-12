@@ -1,0 +1,36 @@
+.page-container {
+  max-width: 800px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.page-description {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 32px 0;
+}
+
+.placeholder-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 60px 40px;
+  text-align: center;
+  border: 2px dashed var(--sidebar-border);
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.placeholder-card p {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin: 0;
+}
