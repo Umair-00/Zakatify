@@ -82,6 +82,14 @@ Thumbs.db
 ehthumbs.db
 desktop.ini
 
+# Claude Code MCP config (may contain tokens)
+.mcp.json
+
 # Editor swap files
 *~
 *.swp
+
+# =========================
+# Supabase
+# =========================
+supabase/.temp/
