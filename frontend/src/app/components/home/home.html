@@ -1,0 +1,205 @@
+<!-- Top Navigation -->
+<nav
+  class="top-nav"
+  [class.top-nav--scrolled]="navScrolled()"
+  role="navigation"
+  aria-label="Main navigation"
+>
+  <div class="nav-inner">
+    <a class="nav-logo" routerLink="/" aria-label="Zakatify home">
+      <span class="nav-logo-mark" aria-hidden="true"></span>
+      Zakatify
+    </a>
+    <div class="nav-links">
+      <button type="button" class="nav-link" (click)="scrollTo('features')">Features</button>
+      <button type="button" class="nav-link" (click)="scrollTo('how-it-works')">How It Works</button>
+      <a routerLink="/login" class="nav-btn nav-btn--ghost">Log in</a>
+      <a routerLink="/signup" class="nav-btn nav-btn--primary">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero">
+  <div class="hero-pattern" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-content reveal-on-scroll">
+      <p class="hero-eyebrow">Zakat made simple</p>
+      <h1 class="hero-title">
+        Know exactly what you owe.<br />
+        <span class="hero-title-accent">Give with certainty.</span>
+      </h1>
+      <p class="hero-subtitle">
+        A guided, step-by-step calculator built on trusted Islamic scholarship.
+        No more guesswork, no more spreadsheets — just clarity.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/signup" class="btn btn--primary btn--lg">
+          Start Your Calculation
+          <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+        <button type="button" class="btn btn--outline btn--lg" (click)="scrollTo('how-it-works')">
+          See How It Works
+        </button>
+      </div>
+    </div>
+    <div class="hero-visual reveal-on-scroll" aria-hidden="true">
+      <div class="hero-card hero-card--main">
+        <div class="hero-card-header">
+          <span class="hero-card-dot"></span>
+          <span class="hero-card-label">Your Zakat Summary</span>
+        </div>
+        <div class="hero-card-row">
+          <span>Total Assets</span>
+          <span class="hero-card-value">$47,250</span>
+        </div>
+        <div class="hero-card-row">
+          <span>Deductions</span>
+          <span class="hero-card-value hero-card-value--muted">-$12,800</span>
+        </div>
+        <div class="hero-card-divider"></div>
+        <div class="hero-card-row hero-card-row--total">
+          <span>Zakat Due</span>
+          <span class="hero-card-value hero-card-value--accent">$861.25</span>
+        </div>
+        <div class="hero-card-bar">
+          <div class="hero-card-bar-fill"></div>
+        </div>
+        <span class="hero-card-bar-label">2.5% of eligible wealth</span>
+      </div>
+      <div class="hero-card hero-card--float">
+        <span class="hero-card-float-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+        <span class="hero-card-float-text">Nisab threshold met</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Features Section -->
+<section id="features" class="section features-section" aria-labelledby="features-heading">
+  <div class="section-inner">
+    <div class="section-header reveal-on-scroll">
+      <p class="section-eyebrow">Why Zakatify</p>
+      <h2 id="features-heading" class="section-title">
+        Everything you need to fulfill your obligation
+      </h2>
+      <p class="section-subtitle">
+        Built specifically for Muslims managing modern finances — bank accounts,
+        retirement plans, investments, and more.
+      </p>
+    </div>
+    <div class="features-grid">
+      @for (feature of features(); track feature.title) {
+        <article class="feature-card reveal-on-scroll">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="feature.iconPath" />
+            </svg>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-desc">{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="section how-section" aria-labelledby="how-heading">
+  <div class="section-inner">
+    <div class="section-header reveal-on-scroll">
+      <p class="section-eyebrow">How It Works</p>
+      <h2 id="how-heading" class="section-title">Three steps to clarity</h2>
+    </div>
+    <div class="steps-grid">
+      @for (step of steps(); track step.number) {
+        <article class="step-card reveal-on-scroll">
+          <span class="step-number" aria-hidden="true">{{ step.number }}</span>
+          <h3 class="step-title">{{ step.title }}</h3>
+          <p class="step-desc">{{ step.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Trust / Methodology Section -->
+<section class="section trust-section" aria-labelledby="trust-heading">
+  <div class="trust-inner reveal-on-scroll">
+    <div class="trust-decoration" aria-hidden="true">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    </div>
+    <h2 id="trust-heading" class="trust-title">
+      Grounded in scholarship you can trust
+    </h2>
+    <p class="trust-body">
+      Every calculation rule in Zakatify is drawn directly from
+      <strong>Joe Bradford's Simple Zakat Guide</strong> (3rd Edition, 2022) — a trusted
+      reference used by thousands of Muslims across North America. From
+      the CRI formula for passive investments to the treatment of retirement accounts,
+      nothing is guessed or improvised.
+    </p>
+    <p class="trust-body">
+      This is a calculation assistant, not a replacement for a qualified scholar.
+      When in doubt, consult your local imam or a zakat expert.
+    </p>
+  </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="section cta-section" aria-labelledby="cta-heading">
+  <div class="cta-inner reveal-on-scroll">
+    <h2 id="cta-heading" class="cta-title">Ready to calculate your zakat?</h2>
+    <p class="cta-subtitle">
+      Join Muslims who are fulfilling their obligation with confidence and clarity.
+    </p>
+    <div class="cta-actions">
+      <a routerLink="/signup" class="btn btn--white btn--lg">
+        Create Free Account
+        <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
+      <a routerLink="/login" class="btn btn--ghost-white btn--lg">
+        Log In
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">Zakatify</span>
+      <p class="footer-tagline">Calculate your zakat with confidence.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4 class="footer-col-title">Product</h4>
+        <ul>
+          <li><button type="button" (click)="scrollTo('features')">Features</button></li>
+          <li><button type="button" (click)="scrollTo('how-it-works')">How It Works</button></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Account</h4>
+        <ul>
+          <li><a routerLink="/login">Log In</a></li>
+          <li><a routerLink="/signup">Sign Up</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Zakatify. This tool is a calculation assistant, not a fatwa.</p>
+    </div>
+  </div>
+</footer>

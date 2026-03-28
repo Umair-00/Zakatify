@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { Home } from './components/home/home';
 import { Login } from './components/login/login';
 import { Signup } from './components/signup/signup';
 import { Layout } from './components/layout/layout';
@@ -14,7 +15,7 @@ import { Settings } from './components/settings/settings';
 import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', component: Home, pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   {
@@ -33,6 +34,5 @@ export const routes: Routes = [
       { path: 'settings', component: Settings }
     ]
   },
-  // Keep legacy route for backwards compatibility
   { path: 'landing', redirectTo: '/dashboard', pathMatch: 'full' }
 ];
