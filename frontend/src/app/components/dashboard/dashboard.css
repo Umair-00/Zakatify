@@ -8,6 +8,7 @@
 }
 
 .welcome-title {
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 32px;
   font-weight: 700;
   color: var(--text-primary);
@@ -37,11 +38,11 @@
 }
 
 .stat-card--blue {
-  border-top-color: var(--accent-blue);
+  border-top-color: var(--primary-green);
 }
 
 .stat-card--orange {
-  border-top-color: var(--accent-orange);
+  border-top-color: var(--gold);
 }
 
 .stat-header {
@@ -55,6 +56,7 @@
 }
 
 .stat-value {
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 36px;
   font-weight: 700;
   color: var(--text-primary);
@@ -73,8 +75,9 @@
 
 .stat-info {
   font-size: 14px;
-  color: var(--accent-orange);
+  color: var(--gold);
   margin: 0;
+  font-weight: 500;
 }
 
 /* Due Card */
@@ -83,7 +86,7 @@
   border-radius: var(--border-radius);
   padding: 24px;
   box-shadow: var(--shadow-sm);
-  border-top: 4px solid var(--accent-purple);
+  border-top: 4px solid var(--primary-green-dark);
   margin-bottom: 24px;
   max-width: calc(50% - 12px);
 }
@@ -95,6 +98,7 @@
 }
 
 .due-value {
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 48px;
   font-weight: 700;
   color: var(--text-primary);
@@ -106,11 +110,12 @@
   font-size: 14px;
   color: var(--primary-green);
   margin: 0;
+  font-weight: 500;
 }
 
 /* Progress Card */
 .progress-card {
-  background: var(--primary-green);
+  background: linear-gradient(135deg, var(--primary-green-deep), var(--primary-green));
   border-radius: var(--border-radius);
   padding: 32px;
   margin-bottom: 24px;
@@ -124,6 +129,7 @@
 }
 
 .progress-title {
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 20px;
   font-weight: 700;
   color: white;
@@ -131,6 +137,7 @@
 }
 
 .progress-percentage {
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 48px;
   font-weight: 700;
   color: white;
@@ -150,19 +157,19 @@
 }
 
 .step-bar {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
   transition: background 0.3s ease;
 }
 
 .step-bar--completed {
-  background: white;
+  background: var(--gold-light);
 }
 
 .step-label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
 }
 
@@ -187,6 +194,7 @@
 .action-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+  border-color: rgba(46, 125, 50, 0.2);
 }
 
 .action-card:focus {

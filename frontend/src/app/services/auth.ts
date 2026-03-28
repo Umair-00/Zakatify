@@ -14,6 +14,7 @@ interface AuthResponse {
   userId?: string;
   email?: string;
   accessToken?: string;
+  refreshToken?: string;
 }
 
 @Injectable({
@@ -24,10 +25,14 @@ export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedIn.asObservable();
 
+  private refreshInProgress: Observable<AuthResponse> | null = null;
+
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('accessToken');
-    if (token) {
+    if (token && !this.isTokenExpired(token)) {
       this.loggedIn.next(true);
+    } else if (token) {
+      this.clearSession();
     }
   }
 
@@ -59,11 +64,39 @@ export class AuthService {
     );
   }
 
+  refreshSession(): Observable<AuthResponse> {
+    if (this.refreshInProgress) {
+      return this.refreshInProgress;
+    }
+
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token'));
+    }
+
+    this.refreshInProgress = this.http
+      .post<AuthResponse>(`${this.apiUrl}/refresh`, { refreshToken })
+      .pipe(
+        tap(response => {
+          this.refreshInProgress = null;
+          if (response.success && response.accessToken) {
+            this.storeSession(response);
+          } else {
+            this.logout();
+          }
+        }),
+        catchError(err => {
+          this.refreshInProgress = null;
+          this.logout();
+          return throwError(() => err);
+        })
+      );
+
+    return this.refreshInProgress;
+  }
+
   logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userEmail');
-    this.loggedIn.next(false);
+    this.clearSession();
     this.router.navigate(['/login']);
   }
 
@@ -75,8 +108,24 @@ export class AuthService {
     return localStorage.getItem('accessToken');
   }
 
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   getUserEmail(): string | null {
     return localStorage.getItem('userEmail');
+  }
+
+  isTokenExpired(token?: string | null): boolean {
+    const t = token ?? this.getToken();
+    if (!t) return true;
+
+    try {
+      const payload = JSON.parse(atob(t.split('.')[1]));
+      return payload.exp * 1000 < Date.now() + 30_000;
+    } catch {
+      return true;
+    }
   }
 
   forgotPassword(email: string): Observable<AuthResponse> {
@@ -101,8 +150,19 @@ export class AuthService {
 
   private storeSession(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken!);
+    if (response.refreshToken) {
+      localStorage.setItem('refreshToken', response.refreshToken);
+    }
     localStorage.setItem('userId', response.userId || '');
     localStorage.setItem('userEmail', response.email || '');
     this.loggedIn.next(true);
+  }
+
+  private clearSession(): void {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+    this.loggedIn.next(false);
   }
 }

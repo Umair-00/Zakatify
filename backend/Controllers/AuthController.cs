@@ -47,7 +47,8 @@ namespace ZakatifyApi.Controllers
                     Message = "Login successful",
                     UserId = session.User.Id,
                     Email = session.User.Email,
-                    AccessToken = session.AccessToken
+                    AccessToken = session.AccessToken,
+                    RefreshToken = session.RefreshToken
                 });
             }
             catch (Exception)
@@ -92,7 +93,8 @@ namespace ZakatifyApi.Controllers
                     Message = "Account created successfully",
                     UserId = session.User.Id,
                     Email = session.User.Email,
-                    AccessToken = session.AccessToken
+                    AccessToken = session.AccessToken,
+                    RefreshToken = session.RefreshToken
                 });
             }
             catch (Exception)
@@ -101,6 +103,48 @@ namespace ZakatifyApi.Controllers
                 {
                     Success = false,
                     Message = "Signup failed. Please try again."
+                });
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshRequest request)
+        {
+            try
+            {
+                var session = await _supabase.Auth.RefreshSession();
+
+                if (session == null)
+                {
+                    await _supabase.Auth.SetSession(string.Empty, request.RefreshToken);
+                    session = await _supabase.Auth.RefreshSession();
+                }
+
+                if (session?.User == null)
+                {
+                    return Ok(new LoginResponse
+                    {
+                        Success = false,
+                        Message = "Session expired. Please log in again."
+                    });
+                }
+
+                return Ok(new LoginResponse
+                {
+                    Success = true,
+                    Message = "Token refreshed",
+                    UserId = session.User.Id,
+                    Email = session.User.Email,
+                    AccessToken = session.AccessToken,
+                    RefreshToken = session.RefreshToken
+                });
+            }
+            catch (Exception)
+            {
+                return Ok(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Session expired. Please log in again."
                 });
             }
         }
