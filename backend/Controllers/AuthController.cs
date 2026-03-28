@@ -9,15 +9,13 @@ namespace ZakatifyApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly Supabase.Client _supabase;
-        private readonly IConfiguration _configuration;
 
         public AuthController(IConfiguration configuration)
         {
-            _configuration = configuration;
-            
-            var url = _configuration["Supabase:Url"] ?? throw new System.ArgumentNullException("Supabase:Url", "Supabase URL must be configured (Supabase:Url).");
-            var key = _configuration["Supabase:ServiceRoleKey"];
-            
+            var url = configuration["Supabase:Url"]
+                ?? throw new ArgumentNullException("Supabase:Url", "Supabase URL must be configured.");
+            var key = configuration["Supabase:ServiceRoleKey"];
+
             var options = new SupabaseOptions
             {
                 AutoRefreshToken = true,
@@ -48,65 +46,126 @@ namespace ZakatifyApi.Controllers
                     Success = true,
                     Message = "Login successful",
                     UserId = session.User.Id,
-                    Email = session.User.Email
+                    Email = session.User.Email,
+                    AccessToken = session.AccessToken
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Ok(new LoginResponse
                 {
                     Success = false,
-                    Message = $"Login failed: {ex.Message}"
+                    Message = "Login failed. Please try again."
                 });
             }
         }
 
-      [HttpPost("signup")]
-public async Task<ActionResult<LoginResponse>> Signup([FromBody] LoginRequest request)
-{
-    try
-    {
-        var session = await _supabase.Auth.SignUp(request.Email, request.Password);
-
-        // Check if signup failed
-        if (session?.User == null)
+        [HttpPost("signup")]
+        public async Task<ActionResult<LoginResponse>> Signup([FromBody] LoginRequest request)
         {
-            return Ok(new LoginResponse
+            try
             {
-                Success = false,
-                Message = "Signup failed. Please try again."
-            });
+                var session = await _supabase.Auth.SignUp(request.Email, request.Password);
+
+                if (session?.User == null)
+                {
+                    return Ok(new LoginResponse
+                    {
+                        Success = false,
+                        Message = "Signup failed. Please try again."
+                    });
+                }
+
+                // Duplicate email: user exists but identities array is empty
+                if (session.User.Identities == null || session.User.Identities.Count == 0)
+                {
+                    return Ok(new LoginResponse
+                    {
+                        Success = false,
+                        Message = "An account with this email already exists"
+                    });
+                }
+
+                return Ok(new LoginResponse
+                {
+                    Success = true,
+                    Message = "Account created successfully",
+                    UserId = session.User.Id,
+                    Email = session.User.Email,
+                    AccessToken = session.AccessToken
+                });
+            }
+            catch (Exception)
+            {
+                return Ok(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Signup failed. Please try again."
+                });
+            }
         }
 
-        // Check for duplicate email: If user exists but identities array is empty, email is taken
-        if (session.User.Identities == null || session.User.Identities.Count == 0)
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult<LoginResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
-            return Ok(new LoginResponse
+            try
             {
-                Success = false,
-                Message = "An account with this email already exists"
-            });
+                // Always return success to prevent email enumeration
+                await _supabase.Auth.ResetPasswordForEmail(request.Email);
+
+                return Ok(new LoginResponse
+                {
+                    Success = true,
+                    Message = "If an account exists with that email, a reset link has been sent."
+                });
+            }
+            catch (Exception)
+            {
+                // Still return success to prevent email enumeration
+                return Ok(new LoginResponse
+                {
+                    Success = true,
+                    Message = "If an account exists with that email, a reset link has been sent."
+                });
+            }
         }
 
-        // Success - new user created
-        return Ok(new LoginResponse
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<LoginResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
         {
-            Success = true,
-            Message = "Account created successfully",
-            UserId = session.User.Id,
-            Email = session.User.Email
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Signup error: {ex.Message}");
-        
-        return Ok(new LoginResponse
-        {
-            Success = false,
-            Message = "Signup failed. Please try again."
-        });
-    }
-}
+            try
+            {
+                // Establish session using the recovery tokens from the email link
+                await _supabase.Auth.SetSession(request.AccessToken, request.RefreshToken);
+
+                // Update the user's password
+                var user = await _supabase.Auth.Update(
+                    new Supabase.Gotrue.UserAttributes { Password = request.NewPassword }
+                );
+
+                if (user == null)
+                {
+                    return Ok(new LoginResponse
+                    {
+                        Success = false,
+                        Message = "Password reset failed. The link may have expired."
+                    });
+                }
+
+                return Ok(new LoginResponse
+                {
+                    Success = true,
+                    Message = "Password updated successfully. You can now log in."
+                });
+            }
+            catch (Exception)
+            {
+                return Ok(new LoginResponse
+                {
+                    Success = false,
+                    Message = "Password reset failed. The link may have expired."
+                });
+            }
+        }
     }
 }

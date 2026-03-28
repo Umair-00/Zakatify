@@ -3,28 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 
-interface LoginRequest {
+interface AuthRequest {
   email: string;
   password: string;
 }
 
-interface LoginResponse {
+interface AuthResponse {
   success: boolean;
   message: string;
   userId?: string;
   email?: string;
-}
-
-interface SignupRequest {
-  email: string;
-  password: string;
-}
-
-interface SignupResponse {
-  success: boolean;
-  message: string;
-  userId?: string;
-  email?: string;
+  accessToken?: string;
 }
 
 @Injectable({
@@ -36,50 +25,42 @@ export class AuthService {
   public isLoggedIn$ = this.loggedIn.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    // Check if user was previously logged in
-    const userId = localStorage.getItem('userId');
-    if (userId) {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
       this.loggedIn.next(true);
     }
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    const request: LoginRequest = { email, password };
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
+  login(email: string, password: string): Observable<AuthResponse> {
+    const request: AuthRequest = { email, password };
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
       tap(response => {
-        if (response.success && response.userId) {
-          // Store user info
-          localStorage.setItem('userId', response.userId);
-          localStorage.setItem('userEmail', response.email || '');
-          this.loggedIn.next(true);
+        if (response.success && response.accessToken) {
+          this.storeSession(response);
         }
       }),
-      catchError(error => {
-        console.error('Login error:', error);
+      catchError(() => {
         return throwError(() => new Error('Login failed. Please try again.'));
       })
     );
   }
 
-  signup(email: string, password: string): Observable<SignupResponse> {
-  const request: SignupRequest = { email, password };
-  return this.http.post<SignupResponse>(`${this.apiUrl}/signup`, request).pipe(
-    tap(response => {
-      if (response.success && response.userId) {
-        // Optionally auto-login after signup
-        localStorage.setItem('userId', response.userId);
-        localStorage.setItem('userEmail', response.email || '');
-        this.loggedIn.next(true);
-      }
-    }),
-    catchError(error => {
-      console.error('Signup error:', error);
-      return throwError(() => new Error('Signup failed. Please try again.'));
-    })
-  );
-}
+  signup(email: string, password: string): Observable<AuthResponse> {
+    const request: AuthRequest = { email, password };
+    return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, request).pipe(
+      tap(response => {
+        if (response.success && response.accessToken) {
+          this.storeSession(response);
+        }
+      }),
+      catchError(() => {
+        return throwError(() => new Error('Signup failed. Please try again.'));
+      })
+    );
+  }
 
   logout(): void {
+    localStorage.removeItem('accessToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
     this.loggedIn.next(false);
@@ -90,7 +71,38 @@ export class AuthService {
     return this.loggedIn.value;
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('accessToken');
+  }
+
   getUserEmail(): string | null {
     return localStorage.getItem('userEmail');
+  }
+
+  forgotPassword(email: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/forgot-password`, { email }).pipe(
+      catchError(() => {
+        return throwError(() => new Error('Request failed. Please try again.'));
+      })
+    );
+  }
+
+  resetPassword(accessToken: string, refreshToken: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/reset-password`, {
+      accessToken,
+      refreshToken,
+      newPassword
+    }).pipe(
+      catchError(() => {
+        return throwError(() => new Error('Password reset failed. Please try again.'));
+      })
+    );
+  }
+
+  private storeSession(response: AuthResponse): void {
+    localStorage.setItem('accessToken', response.accessToken!);
+    localStorage.setItem('userId', response.userId || '');
+    localStorage.setItem('userEmail', response.email || '');
+    this.loggedIn.next(true);
   }
 }
