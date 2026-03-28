@@ -30,6 +30,9 @@ yarn-error.log*
 .env
 .env.local
 
+# Local secrets (never commit)
+appsettings.Local.json
+
 # =========================
 # .NET / Visual Studio
 # =========================

@@ -6,6 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load local secrets file (gitignored)
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
