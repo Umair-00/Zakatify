@@ -51,4 +51,22 @@
   <main class="main-content" role="main">
     <router-outlet />
   </main>
+
+  @if (showIdleWarning()) {
+    <div class="idle-overlay" role="alertdialog" aria-modal="true" aria-label="Session expiring">
+      <div class="idle-modal">
+        <div class="idle-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h2 class="idle-title">Session expiring</h2>
+        <p class="idle-text">You've been inactive. You'll be logged out in 60 seconds.</p>
+        <div class="idle-actions">
+          <button class="idle-btn idle-btn--primary" (click)="onStayLoggedIn()">Stay logged in</button>
+          <button class="idle-btn idle-btn--secondary" (click)="onLogout()">Log out</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

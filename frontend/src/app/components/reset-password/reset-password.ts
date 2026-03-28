@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { PasswordStrengthService, PasswordStrength } from '../../services/password-strength';
 
 @Component({
   selector: 'app-reset-password',
@@ -17,6 +18,11 @@ export class ResetPassword implements OnInit {
   successMessage: string = '';
   isLoading: boolean = false;
   tokenError: boolean = false;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
+  passwordStrength: PasswordStrength | null = null;
+  breachWarning: string = '';
 
   private accessToken: string = '';
   private refreshToken: string = '';
@@ -24,8 +30,18 @@ export class ResetPassword implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private passwordStrengthService: PasswordStrengthService
   ) {}
+
+  onPasswordChange(): void {
+    if (this.newPassword) {
+      this.passwordStrength = this.passwordStrengthService.evaluate(this.newPassword);
+    } else {
+      this.passwordStrength = null;
+    }
+    this.breachWarning = '';
+  }
 
   ngOnInit(): void {
     // Supabase redirects with tokens in the URL hash fragment:
@@ -42,11 +58,21 @@ export class ResetPassword implements OnInit {
     }
   }
 
-  onSubmit(event: Event): void {
+  async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
 
     if (!this.newPassword || !this.confirmPassword) {
       this.errorMessage = 'Please fill in both fields';
+      return;
+    }
+
+    if (this.newPassword.length > 128) {
+      this.errorMessage = 'Password must be 128 characters or less';
+      return;
+    }
+
+    if (this.passwordStrength?.blocked) {
+      this.errorMessage = this.passwordStrength.reason;
       return;
     }
 
@@ -55,13 +81,17 @@ export class ResetPassword implements OnInit {
       return;
     }
 
-    if (this.newPassword.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters';
-      return;
-    }
-
     this.isLoading = true;
     this.errorMessage = '';
+    this.breachWarning = '';
+
+    const isBreached = await this.passwordStrengthService.checkBreached(this.newPassword);
+    if (isBreached) {
+      this.isLoading = false;
+      this.breachWarning = 'This password has appeared in a data breach. Please choose a different one.';
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.authService.resetPassword(this.accessToken, this.refreshToken, this.newPassword).subscribe({
       next: (response) => {

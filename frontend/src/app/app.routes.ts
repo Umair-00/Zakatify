@@ -15,12 +15,13 @@ import { Business } from './components/business/business';
 import { AskScholar } from './components/ask-scholar/ask-scholar';
 import { Settings } from './components/settings/settings';
 import { authGuard } from './guards/auth-guard';
+import { noAuthGuard } from './guards/no-auth-guard';
 
 export const routes: Routes = [
   { path: '', component: Home, pathMatch: 'full' },
-  { path: 'login', component: Login },
-  { path: 'signup', component: Signup },
-  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'login', component: Login, canActivate: [noAuthGuard] },
+  { path: 'signup', component: Signup, canActivate: [noAuthGuard] },
+  { path: 'forgot-password', component: ForgotPassword, canActivate: [noAuthGuard] },
   { path: 'reset-password', component: ResetPassword },
   {
     path: '',

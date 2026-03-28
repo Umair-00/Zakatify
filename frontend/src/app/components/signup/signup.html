@@ -43,6 +43,33 @@
       </div>
 
       <form (ngSubmit)="onSubmit($event)">
+        <div class="field-row">
+          <div class="field">
+            <label for="firstName" class="field-label">First name</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              [(ngModel)]="firstName"
+              placeholder="First"
+              [disabled]="isLoading"
+              autocomplete="given-name"
+            />
+          </div>
+          <div class="field">
+            <label for="lastName" class="field-label">Last name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              [(ngModel)]="lastName"
+              placeholder="Last"
+              [disabled]="isLoading"
+              autocomplete="family-name"
+            />
+          </div>
+        </div>
+
         <div class="field">
           <label for="email" class="field-label">Email address</label>
           <input
@@ -56,30 +83,154 @@
           />
         </div>
 
+        <div class="field-row">
+          <div class="field">
+            <label for="country" class="field-label">Country</label>
+            <select
+              id="country"
+              name="country"
+              [(ngModel)]="country"
+              (ngModelChange)="onCountryChange()"
+              [disabled]="isLoading"
+              autocomplete="country"
+            >
+              <option value="" disabled>Select country</option>
+              <option *ngFor="let c of countries" [value]="c.code">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="currency" class="field-label">Currency</label>
+            <select
+              id="currency"
+              name="currency"
+              [(ngModel)]="currency"
+              [disabled]="isLoading"
+            >
+              <option value="USD">USD</option>
+              <option value="CAD">CAD</option>
+              <option value="GBP">GBP</option>
+              <option value="EUR">EUR</option>
+              <option value="AED">AED</option>
+              <option value="SAR">SAR</option>
+              <option value="MYR">MYR</option>
+              <option value="PKR">PKR</option>
+              <option value="INR">INR</option>
+              <option value="BDT">BDT</option>
+              <option value="IDR">IDR</option>
+              <option value="TRY">TRY</option>
+              <option value="EGP">EGP</option>
+              <option value="NGN">NGN</option>
+              <option value="AUD">AUD</option>
+              <option value="SEK">SEK</option>
+              <option value="SGD">SGD</option>
+              <option value="ZAR">ZAR</option>
+            </select>
+          </div>
+        </div>
+
         <div class="field">
           <label for="password" class="field-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            [(ngModel)]="password"
-            placeholder="At least 6 characters"
-            [disabled]="isLoading"
-            autocomplete="new-password"
-          />
+          <div class="field-password">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              name="password"
+              [(ngModel)]="password"
+              (input)="onPasswordChange()"
+              placeholder="At least 8 characters"
+              [disabled]="isLoading"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Password strength meter -->
+          <div class="strength-meter" *ngIf="passwordStrength && password.length > 0">
+            <div class="strength-bar">
+              <div
+                class="strength-bar-fill"
+                [style.width.%]="passwordStrength.score * 25"
+                [style.backgroundColor]="passwordStrength.color"
+              ></div>
+            </div>
+            <span class="strength-label" [style.color]="passwordStrength.color">
+              {{ passwordStrength.label }}
+            </span>
+          </div>
+
+          <!-- Blocked reason -->
+          <p class="strength-blocked" *ngIf="passwordStrength?.blocked">
+            {{ passwordStrength!.reason }}
+          </p>
+
+          <!-- Breach warning -->
+          <p class="strength-blocked" *ngIf="breachWarning">
+            {{ breachWarning }}
+          </p>
+
+          <!-- Requirements checklist -->
+          <ul class="strength-checks" *ngIf="passwordStrength && password.length > 0">
+            <li [class.met]="passwordStrength.checks.minLength">
+              <span class="check-icon">{{ passwordStrength.checks.minLength ? '&#10003;' : '&#10005;' }}</span>
+              At least 8 characters
+            </li>
+            <li [class.met]="passwordStrength.checks.hasUpper">
+              <span class="check-icon">{{ passwordStrength.checks.hasUpper ? '&#10003;' : '&#10005;' }}</span>
+              Uppercase letter
+            </li>
+            <li [class.met]="passwordStrength.checks.hasLower">
+              <span class="check-icon">{{ passwordStrength.checks.hasLower ? '&#10003;' : '&#10005;' }}</span>
+              Lowercase letter
+            </li>
+            <li [class.met]="passwordStrength.checks.hasNumber">
+              <span class="check-icon">{{ passwordStrength.checks.hasNumber ? '&#10003;' : '&#10005;' }}</span>
+              Number
+            </li>
+            <li [class.met]="passwordStrength.checks.hasSpecial">
+              <span class="check-icon">{{ passwordStrength.checks.hasSpecial ? '&#10003;' : '&#10005;' }}</span>
+              Special character
+            </li>
+          </ul>
         </div>
 
         <div class="field">
           <label for="confirmPassword" class="field-label">Confirm password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword"
-            placeholder="Re-enter your password"
-            [disabled]="isLoading"
-            autocomplete="new-password"
-          />
+          <div class="field-password">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              placeholder="Re-enter your password"
+              [disabled]="isLoading"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showConfirmPassword = !showConfirmPassword"
+              [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+            >
+              <svg *ngIf="!showConfirmPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg *ngIf="showConfirmPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="auth-submit" [disabled]="isLoading">

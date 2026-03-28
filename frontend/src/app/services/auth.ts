@@ -8,6 +8,15 @@ interface AuthRequest {
   password: string;
 }
 
+interface SignupRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  currency: string;
+}
+
 interface AuthResponse {
   success: boolean;
   message: string;
@@ -15,6 +24,16 @@ interface AuthResponse {
   email?: string;
   accessToken?: string;
   refreshToken?: string;
+}
+
+export interface ProfileResponse {
+  success: boolean;
+  message: string;
+  id?: string;
+  firstName?: string;
+  lastName?: string;
+  country?: string;
+  currency?: string;
 }
 
 @Injectable({
@@ -50,8 +69,7 @@ export class AuthService {
     );
   }
 
-  signup(email: string, password: string): Observable<AuthResponse> {
-    const request: AuthRequest = { email, password };
+  signup(request: SignupRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/signup`, request).pipe(
       tap(response => {
         if (response.success && response.accessToken) {
@@ -62,6 +80,10 @@ export class AuthService {
         return throwError(() => new Error('Signup failed. Please try again.'));
       })
     );
+  }
+
+  getProfile(): Observable<ProfileResponse> {
+    return this.http.get<ProfileResponse>(`${this.apiUrl}/profile`);
   }
 
   refreshSession(): Observable<AuthResponse> {
@@ -116,6 +138,21 @@ export class AuthService {
     return localStorage.getItem('userEmail');
   }
 
+  getUserName(): string | null {
+    return localStorage.getItem('userName');
+  }
+
+  fetchAndStoreProfile(): void {
+    this.getProfile().subscribe({
+      next: (profile) => {
+        if (profile.success && profile.firstName) {
+          localStorage.setItem('userName', `${profile.firstName} ${profile.lastName}`);
+          localStorage.setItem('userFirstName', profile.firstName);
+        }
+      }
+    });
+  }
+
   isTokenExpired(token?: string | null): boolean {
     const t = token ?? this.getToken();
     if (!t) return true;
@@ -163,6 +200,8 @@ export class AuthService {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userFirstName');
     this.loggedIn.next(false);
   }
 }

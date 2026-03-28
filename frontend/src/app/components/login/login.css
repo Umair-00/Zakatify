@@ -131,6 +131,12 @@
   border: 1px solid #fecaca;
 }
 
+.auth-alert--info {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
 /* FORM FIELDS */
 .field {
   margin-bottom: 20px;
@@ -166,6 +172,34 @@
 
 .field input::placeholder { color: #94a3b8; }
 .field input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* PASSWORD TOGGLE */
+.field-password {
+  position: relative;
+}
+
+.field-password input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #64748b;
+}
 
 /* FORGOT PASSWORD */
 .forgot-password-row {

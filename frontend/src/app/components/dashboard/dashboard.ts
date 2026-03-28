@@ -24,6 +24,10 @@ export class Dashboard {
   calculationSteps = signal<CalculationStep[]>(CALCULATION_STEPS);
 
   userName = computed(() => {
+    const fullName = this.authService.getUserName();
+    if (fullName) {
+      return fullName.split(' ')[0]; // First name only for greeting
+    }
     const email = this.authService.getUserEmail();
     if (!email) return 'User';
     const name = email.split('@')[0];

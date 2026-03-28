@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, signal, inject, AfterViewInit, OnDestroy, PLATFORM_ID } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, ChangeDetectionStrategy, signal, inject, AfterViewInit, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
@@ -9,11 +9,25 @@ import { isPlatformBrowser } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink]
 })
-export class Home implements AfterViewInit, OnDestroy {
+export class Home implements OnInit, AfterViewInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
   private observer: IntersectionObserver | null = null;
 
   navScrolled = signal(false);
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+      const params = new URLSearchParams(hash);
+      if (params.get('type') === 'recovery' && params.get('access_token')) {
+        window.location.replace('/reset-password' + window.location.hash);
+        return;
+      }
+    }
+  }
 
   features = signal([
     {
