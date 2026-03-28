@@ -139,6 +139,10 @@ Base URL: `http://localhost:5102/api`
 - No third-party sharing without consent
 - **Disclaimer**: App is a calculation assistant, not a replacement for a qualified scholar
 
+## Zakat Domain Reference
+- **ZAKAT_RULES.md** — Distilled calculation rules, asset categories, formulas, and recipient rules from Joe Bradford's "Simple Zakat Guide" (3rd Ed. 2022). This is the authoritative source for all zakat logic in the app. Read it before implementing any calculation or flow logic.
+- **zakat_extracted.txt** — Full OCR extraction of the book (134 pages). Reference for deeper detail on any topic.
+
 ## Development Notes
 - CORS configured for localhost:4200
 - Supabase credentials in appsettings.json (move to secrets for production)
