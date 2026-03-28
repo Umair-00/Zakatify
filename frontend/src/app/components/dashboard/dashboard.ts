@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { AuthService } from '../../services/auth';
@@ -16,23 +16,37 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CurrencyPipe]
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
   stats = signal<DashboardStats>(MOCK_DASHBOARD_STATS);
   calculationSteps = signal<CalculationStep[]>(CALCULATION_STEPS);
+  userFirstName = signal<string>('');
 
   userName = computed(() => {
-    const fullName = this.authService.getUserName();
-    if (fullName) {
-      return fullName.split(' ')[0]; // First name only for greeting
-    }
+    const firstName = this.userFirstName();
+    if (firstName) return firstName;
     const email = this.authService.getUserEmail();
     if (!email) return 'User';
     const name = email.split('@')[0];
     return name.charAt(0).toUpperCase() + name.slice(1);
   });
+
+  ngOnInit(): void {
+    const cached = this.authService.getUserName();
+    if (cached) {
+      this.userFirstName.set(cached.split(' ')[0]);
+    } else {
+      this.authService.getProfile().subscribe({
+        next: (profile) => {
+          if (profile.success && profile.firstName) {
+            this.userFirstName.set(profile.firstName);
+          }
+        }
+      });
+    }
+  }
 
   calculationProgress = computed(() => {
     const steps = this.calculationSteps();

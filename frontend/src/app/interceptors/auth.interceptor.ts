@@ -6,7 +6,9 @@ import { AuthService } from '../services/auth';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  if (req.url.includes('/api/auth/')) {
+  // Skip auth header for public auth endpoints (but not profile)
+  const publicAuthPaths = ['/login', '/signup', '/refresh', '/forgot-password', '/reset-password'];
+  if (req.url.includes('/api/auth/') && publicAuthPaths.some(p => req.url.endsWith(p))) {
     return next(req);
   }
 

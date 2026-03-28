@@ -46,6 +46,25 @@ export class Layout implements OnInit, OnDestroy {
     this.idleSub = this.idleService.showWarning$.subscribe(show => {
       this.showIdleWarning.set(show);
     });
+
+    // Fetch profile if name isn't cached yet
+    if (!this.authService.getUserName()) {
+      this.authService.getProfile().subscribe({
+        next: (profile) => {
+          console.log('Profile response:', profile);
+          if (profile.success && profile.firstName) {
+            localStorage.setItem('userName', `${profile.firstName} ${profile.lastName}`);
+            localStorage.setItem('userFirstName', profile.firstName);
+            this.userFullName.set(`${profile.firstName} ${profile.lastName}`);
+          }
+        },
+        error: (err) => {
+          console.error('Profile fetch failed:', err);
+        }
+      });
+    } else {
+      console.log('Using cached name:', this.authService.getUserName());
+    }
   }
 
   ngOnDestroy(): void {
