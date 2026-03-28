@@ -39,7 +39,7 @@ export class Login {
       next: (response) => {
         console.log('Login response:', response);
         if (response.success) {
-          this.router.navigate(['/landing']);
+          this.router.navigate(['/dashboard']);
         } else {
           this.isLoading = false;
           this.errorMessage = response.message;
