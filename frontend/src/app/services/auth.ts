@@ -34,6 +34,9 @@ export interface ProfileResponse {
   lastName?: string;
   country?: string;
   currency?: string;
+  nisabBasis?: string;
+  calendarType?: string;
+  zakatAnniversary?: string;
 }
 
 @Injectable({
@@ -84,6 +87,25 @@ export class AuthService {
 
   getProfile(): Observable<ProfileResponse> {
     return this.http.get<ProfileResponse>(`${this.apiUrl}/profile`);
+  }
+
+  updateProfile(data: {
+    firstName: string;
+    lastName: string;
+    country: string;
+    currency: string;
+    nisabBasis: string;
+    calendarType: string;
+    zakatAnniversary: string | null;
+  }): Observable<ProfileResponse> {
+    return this.http.put<ProfileResponse>(`${this.apiUrl}/profile`, data).pipe(
+      tap(response => {
+        if (response.success && response.firstName) {
+          localStorage.setItem('userName', `${response.firstName} ${response.lastName}`);
+          localStorage.setItem('userFirstName', response.firstName);
+        }
+      })
+    );
   }
 
   refreshSession(): Observable<AuthResponse> {

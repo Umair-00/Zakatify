@@ -273,12 +273,111 @@ namespace ZakatifyApi.Controllers
                     FirstName = response.FirstName,
                     LastName = response.LastName,
                     Country = response.Country,
-                    Currency = response.Currency
+                    Currency = response.Currency,
+                    NisabBasis = response.NisabBasis,
+                    CalendarType = response.CalendarType,
+                    ZakatAnniversary = response.ZakatAnniversary?.ToString("yyyy-MM-dd")
                 });
             }
             catch (Exception)
             {
                 return Ok(new ProfileResponse { Success = false, Message = "Failed to retrieve profile" });
+            }
+        }
+
+        [HttpPut("profile")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<ActionResult<ProfileResponse>> UpdateProfile([FromBody] UpdateProfileRequest request)
+        {
+            var userId = User.FindFirst("sub")?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "Unauthorized" });
+            }
+
+            request.FirstName = request.FirstName.Trim();
+            request.LastName = request.LastName.Trim();
+
+            if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "First name and last name are required." });
+            }
+
+            if (request.FirstName.Length > 50 || request.LastName.Length > 50)
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "Name must be 50 characters or less." });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Country) || request.Country.Length != 2)
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "A valid country is required." });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Currency) || request.Currency.Length != 3)
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "A valid currency is required." });
+            }
+
+            if (request.NisabBasis != "gold" && request.NisabBasis != "silver")
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "Nisab basis must be 'gold' or 'silver'." });
+            }
+
+            if (request.CalendarType != "lunar" && request.CalendarType != "gregorian")
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "Calendar type must be 'lunar' or 'gregorian'." });
+            }
+
+            DateTime? zakatAnniversary = null;
+            if (!string.IsNullOrEmpty(request.ZakatAnniversary))
+            {
+                if (!DateTime.TryParse(request.ZakatAnniversary, out var parsed))
+                {
+                    return Ok(new ProfileResponse { Success = false, Message = "Invalid zakat anniversary date." });
+                }
+                zakatAnniversary = parsed;
+            }
+
+            try
+            {
+                var existing = await _supabaseAdmin.From<Profile>()
+                    .Where(p => p.Id == userId)
+                    .Single();
+
+                if (existing == null)
+                {
+                    return Ok(new ProfileResponse { Success = false, Message = "Profile not found" });
+                }
+
+                existing.FirstName = request.FirstName;
+                existing.LastName = request.LastName;
+                existing.Country = request.Country.ToUpperInvariant();
+                existing.Currency = request.Currency.ToUpperInvariant();
+                existing.NisabBasis = request.NisabBasis;
+                existing.CalendarType = request.CalendarType;
+                existing.ZakatAnniversary = zakatAnniversary;
+
+                await _supabaseAdmin.From<Profile>()
+                    .Where(p => p.Id == userId)
+                    .Update(existing);
+
+                return Ok(new ProfileResponse
+                {
+                    Success = true,
+                    Message = "Profile updated",
+                    Id = existing.Id,
+                    FirstName = existing.FirstName,
+                    LastName = existing.LastName,
+                    Country = existing.Country,
+                    Currency = existing.Currency,
+                    NisabBasis = existing.NisabBasis,
+                    CalendarType = existing.CalendarType,
+                    ZakatAnniversary = existing.ZakatAnniversary?.ToString("yyyy-MM-dd")
+                });
+            }
+            catch (Exception)
+            {
+                return Ok(new ProfileResponse { Success = false, Message = "Failed to update profile" });
             }
         }
 

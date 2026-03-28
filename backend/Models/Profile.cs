@@ -22,6 +22,15 @@ namespace ZakatifyApi.Models
         [Column("currency")]
         public string Currency { get; set; } = "USD";
 
+        [Column("nisab_basis")]
+        public string NisabBasis { get; set; } = "silver";
+
+        [Column("calendar_type")]
+        public string CalendarType { get; set; } = "lunar";
+
+        [Column("zakat_anniversary")]
+        public DateTime? ZakatAnniversary { get; set; }
+
         [Column("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
 

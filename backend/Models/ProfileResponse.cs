@@ -9,5 +9,8 @@ namespace ZakatifyApi.Models
         public string? LastName { get; set; }
         public string? Country { get; set; }
         public string? Currency { get; set; }
+        public string? NisabBasis { get; set; }
+        public string? CalendarType { get; set; }
+        public string? ZakatAnniversary { get; set; }
     }
 }

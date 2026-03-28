@@ -1,0 +1,238 @@
+<div class="settings">
+  <div class="settings-header">
+    <h1 class="settings-title">Settings</h1>
+    <p class="settings-subtitle">Manage your profile, preferences, and account</p>
+  </div>
+
+  <!-- Profile Card -->
+  <section class="settings-card" aria-labelledby="profile-heading">
+    <div class="card-header">
+      <h2 class="card-title" id="profile-heading">Profile</h2>
+      <p class="card-desc">Your personal information</p>
+    </div>
+
+    <div class="card-body" *ngIf="!profileLoading()">
+      <div class="settings-alert settings-alert--error" *ngIf="profileError()">
+        {{ profileError() }}
+      </div>
+      <div class="settings-alert settings-alert--success" *ngIf="profileMessage()">
+        {{ profileMessage() }}
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="firstName" class="field-label">First name</label>
+          <input
+            type="text"
+            id="firstName"
+            [ngModel]="firstName()"
+            (ngModelChange)="firstName.set($event)"
+            [disabled]="profileSaving()"
+            autocomplete="given-name"
+          />
+        </div>
+        <div class="field">
+          <label for="lastName" class="field-label">Last name</label>
+          <input
+            type="text"
+            id="lastName"
+            [ngModel]="lastName()"
+            (ngModelChange)="lastName.set($event)"
+            [disabled]="profileSaving()"
+            autocomplete="family-name"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email" class="field-label">Email address</label>
+        <input
+          type="email"
+          id="email"
+          [value]="email()"
+          disabled
+          class="field-disabled"
+        />
+        <span class="field-hint">Contact support to change your email</span>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="country" class="field-label">Country</label>
+          <select
+            id="country"
+            [ngModel]="country()"
+            (ngModelChange)="onCountryChange($event)"
+            [disabled]="profileSaving()"
+          >
+            <option value="" disabled>Select country</option>
+            <option *ngFor="let c of countries" [value]="c.code">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="currency" class="field-label">Currency</label>
+          <select
+            id="currency"
+            [ngModel]="currency()"
+            (ngModelChange)="currency.set($event)"
+            [disabled]="profileSaving()"
+          >
+            <option *ngFor="let cur of currencies" [value]="cur">{{ cur }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="saveProfile()"
+          [disabled]="profileSaving()"
+        >
+          {{ profileSaving() ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body card-loading" *ngIf="profileLoading()">
+      Loading profile...
+    </div>
+  </section>
+
+  <!-- Zakat Preferences Card -->
+  <section class="settings-card" aria-labelledby="zakat-heading">
+    <div class="card-header">
+      <h2 class="card-title" id="zakat-heading">Zakat Preferences</h2>
+      <p class="card-desc">Configure how your zakat is calculated</p>
+    </div>
+
+    <div class="card-body" *ngIf="!profileLoading()">
+      <div class="field">
+        <label class="field-label">Nisab basis</label>
+        <p class="field-explainer">
+          The nisab is the minimum wealth threshold before zakat becomes obligatory.
+          Silver (595g) is recommended by AAOIFI and results in a lower threshold,
+          meaning more people qualify to pay zakat. Gold (85g) sets a higher threshold.
+        </p>
+        <div class="radio-group" role="radiogroup" aria-label="Nisab basis">
+          <label class="radio-option" [class.radio-option--active]="nisabBasis() === 'silver'">
+            <input
+              type="radio"
+              name="nisabBasis"
+              value="silver"
+              [checked]="nisabBasis() === 'silver'"
+              (change)="nisabBasis.set('silver')"
+              [disabled]="profileSaving()"
+            />
+            <span class="radio-label">
+              <strong>Silver</strong>
+              <span class="radio-desc">595g of silver &mdash; recommended (AAOIFI)</span>
+            </span>
+          </label>
+          <label class="radio-option" [class.radio-option--active]="nisabBasis() === 'gold'">
+            <input
+              type="radio"
+              name="nisabBasis"
+              value="gold"
+              [checked]="nisabBasis() === 'gold'"
+              (change)="nisabBasis.set('gold')"
+              [disabled]="profileSaving()"
+            />
+            <span class="radio-label">
+              <strong>Gold</strong>
+              <span class="radio-desc">85g of gold &mdash; higher threshold</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Calendar type</label>
+        <p class="field-explainer">
+          Zakat is traditionally calculated on a lunar (Hijri) year at 2.5%.
+          If you use a Gregorian year, the rate adjusts to 2.578% to account for the longer year.
+        </p>
+        <div class="radio-group" role="radiogroup" aria-label="Calendar type">
+          <label class="radio-option" [class.radio-option--active]="calendarType() === 'lunar'">
+            <input
+              type="radio"
+              name="calendarType"
+              value="lunar"
+              [checked]="calendarType() === 'lunar'"
+              (change)="calendarType.set('lunar')"
+              [disabled]="profileSaving()"
+            />
+            <span class="radio-label">
+              <strong>Lunar (Hijri)</strong>
+              <span class="radio-desc">Traditional &mdash; 2.5% rate</span>
+            </span>
+          </label>
+          <label class="radio-option" [class.radio-option--active]="calendarType() === 'gregorian'">
+            <input
+              type="radio"
+              name="calendarType"
+              value="gregorian"
+              [checked]="calendarType() === 'gregorian'"
+              (change)="calendarType.set('gregorian')"
+              [disabled]="profileSaving()"
+            />
+            <span class="radio-label">
+              <strong>Gregorian</strong>
+              <span class="radio-desc">Solar year &mdash; 2.578% rate</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="zakatAnniversary" class="field-label">Zakat anniversary date</label>
+        <p class="field-explainer">
+          The annual date you assess your wealth and calculate zakat.
+          Many people use the first day of Ramadan or a fixed Gregorian date.
+        </p>
+        <input
+          type="date"
+          id="zakatAnniversary"
+          [ngModel]="zakatAnniversary()"
+          (ngModelChange)="zakatAnniversary.set($event)"
+          [disabled]="profileSaving()"
+        />
+      </div>
+
+      <div class="card-actions">
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="saveProfile()"
+          [disabled]="profileSaving()"
+        >
+          {{ profileSaving() ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body card-loading" *ngIf="profileLoading()">
+      Loading preferences...
+    </div>
+  </section>
+
+  <!-- Account Card -->
+  <section class="settings-card" aria-labelledby="account-heading">
+    <div class="card-header">
+      <h2 class="card-title" id="account-heading">Account</h2>
+      <p class="card-desc">Password and account management</p>
+    </div>
+
+    <div class="card-body">
+      <div class="account-row">
+        <div class="account-info">
+          <span class="account-label">Password</span>
+          <span class="account-value">Change your account password</span>
+        </div>
+        <button type="button" class="btn btn--secondary" (click)="changePassword()">
+          Change password
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

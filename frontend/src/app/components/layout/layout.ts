@@ -21,6 +21,8 @@ export class Layout implements OnInit, OnDestroy {
   userEmail = signal<string | null>(this.authService.getUserEmail());
   userFullName = signal<string | null>(this.authService.getUserName());
   showIdleWarning = signal(false);
+  sidebarOpen = signal(false);
+  sidebarCollapsed = signal(false);
 
   userName = computed(() => {
     const fullName = this.userFullName();
@@ -51,25 +53,31 @@ export class Layout implements OnInit, OnDestroy {
     if (!this.authService.getUserName()) {
       this.authService.getProfile().subscribe({
         next: (profile) => {
-          console.log('Profile response:', profile);
           if (profile.success && profile.firstName) {
             localStorage.setItem('userName', `${profile.firstName} ${profile.lastName}`);
             localStorage.setItem('userFirstName', profile.firstName);
             this.userFullName.set(`${profile.firstName} ${profile.lastName}`);
           }
-        },
-        error: (err) => {
-          console.error('Profile fetch failed:', err);
         }
       });
-    } else {
-      console.log('Using cached name:', this.authService.getUserName());
     }
   }
 
   ngOnDestroy(): void {
     this.idleService.stop();
     this.idleSub?.unsubscribe();
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
+
+  toggleCollapse(): void {
+    this.sidebarCollapsed.update(v => !v);
   }
 
   onStayLoggedIn(): void {

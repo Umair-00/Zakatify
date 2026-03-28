@@ -30,8 +30,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: 'SUPPORT',
     items: [
-      { label: 'Ask a Scholar', route: '/ask-scholar', icon: '💬' },
-      { label: 'Settings', route: '/settings', icon: '⚙️' }
+      { label: 'Ask a Scholar', route: '/ask-scholar', icon: '💬' }
     ]
   }
 ];
