@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Supabase;
 using ZakatifyApi.Models;
 
@@ -14,7 +15,7 @@ namespace ZakatifyApi.Controllers
         {
             var url = configuration["Supabase:Url"]
                 ?? throw new ArgumentNullException("Supabase:Url", "Supabase URL must be configured.");
-            var key = configuration["Supabase:ServiceRoleKey"];
+            var key = configuration["Supabase:AnonKey"];
 
             var options = new SupabaseOptions
             {
@@ -26,6 +27,7 @@ namespace ZakatifyApi.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("auth-strict")]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {
             try
@@ -62,6 +64,7 @@ namespace ZakatifyApi.Controllers
         }
 
         [HttpPost("signup")]
+        [EnableRateLimiting("auth-signup")]
         public async Task<ActionResult<LoginResponse>> Signup([FromBody] LoginRequest request)
         {
             try
@@ -108,6 +111,7 @@ namespace ZakatifyApi.Controllers
         }
 
         [HttpPost("refresh")]
+        [EnableRateLimiting("auth-refresh")]
         public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshRequest request)
         {
             try
@@ -150,6 +154,7 @@ namespace ZakatifyApi.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [EnableRateLimiting("auth-email")]
         public async Task<ActionResult<LoginResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
             try
@@ -175,6 +180,7 @@ namespace ZakatifyApi.Controllers
         }
 
         [HttpPost("reset-password")]
+        [EnableRateLimiting("auth-strict")]
         public async Task<ActionResult<LoginResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
         {
             try
