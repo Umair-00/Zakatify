@@ -1,0 +1,177 @@
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <h1 class="chat-title">Ask a Scholar</h1>
+      <p class="chat-subtitle">Zakat guidance based on Joe Bradford's Simple Zakat Guide</p>
+    </div>
+    <div class="chat-header-actions">
+      <button
+        type="button"
+        class="header-btn"
+        (click)="toggleHistory()"
+        [attr.aria-expanded]="showHistory()"
+        aria-label="Toggle conversation history"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+        History
+      </button>
+      <button
+        type="button"
+        class="header-btn header-btn--new"
+        (click)="startNewConversation()"
+        aria-label="Start new conversation"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        New
+      </button>
+    </div>
+  </div>
+
+  <!-- Conversation history panel -->
+  @if (showHistory()) {
+    <div class="history-panel">
+      <div class="history-header">
+        <span class="history-label">Recent conversations</span>
+      </div>
+      @if (conversations().length === 0) {
+        <p class="history-empty">No conversations yet</p>
+      }
+      @for (conv of conversations(); track conv.id) {
+        <button
+          type="button"
+          class="history-item"
+          [class.history-item--active]="activeConversationId() === conv.id"
+          (click)="selectConversation(conv)"
+        >
+          <span class="history-item-title">{{ conv.title || 'Untitled' }}</span>
+          <button
+            type="button"
+            class="history-delete"
+            (click)="deleteConversation(conv, $event)"
+            aria-label="Delete conversation"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Messages area -->
+  <div class="chat-messages" #messagesContainer>
+    @if (!hasMessages() && !isLoading()) {
+      <!-- Empty state -->
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+        </div>
+        <h2 class="empty-title">Ask about zakat</h2>
+        <p class="empty-desc">
+          Get answers grounded in Joe Bradford's Simple Zakat Guide.
+          This is a learning tool, not a replacement for a qualified scholar.
+        </p>
+        <div class="example-questions">
+          @for (q of exampleQuestions; track q) {
+            <button
+              type="button"
+              class="example-btn"
+              (click)="sendMessage(q)"
+            >
+              {{ q }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @for (msg of messages(); track $index) {
+      <div class="message" [class.message--user]="msg.role === 'user'" [class.message--assistant]="msg.role === 'assistant'">
+        @if (msg.role === 'assistant') {
+          <div class="message-avatar" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+          </div>
+        }
+        <div class="message-content">
+          @if (msg.role === 'assistant') {
+            <div class="message-text markdown-body" [innerHTML]="msg.content | markdown"></div>
+          } @else {
+            <div class="message-text" [innerText]="msg.content"></div>
+          }
+          @if (msg.sources && msg.sources.length > 0) {
+            <div class="message-sources">
+              <span class="sources-label">Sources:</span>
+              @for (src of msg.sources; track $index) {
+                @if (src.sectionTitle || src.sourceLocation || src.source) {
+                  <span class="source-tag">{{ src.sectionTitle || src.sourceLocation || src.source }}</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="message message--assistant">
+        <div class="message-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator" aria-label="Generating response">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="chat-error">{{ error() }}</div>
+    }
+  </div>
+
+  <!-- Input area -->
+  <div class="chat-input-area">
+    <div class="chat-input-wrapper">
+      <textarea
+        class="chat-input"
+        [ngModel]="inputMessage()"
+        (ngModelChange)="inputMessage.set($event)"
+        (keydown)="onKeyDown($event)"
+        placeholder="Ask a zakat question..."
+        [disabled]="isLoading()"
+        rows="1"
+        aria-label="Type your question"
+      ></textarea>
+      <button
+        type="button"
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="isLoading() || !inputMessage().trim()"
+        aria-label="Send message"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+    <p class="chat-disclaimer">
+      Answers are based on Joe Bradford's Simple Zakat Guide. For complex situations, consult a qualified scholar.
+    </p>
+  </div>
+</div>

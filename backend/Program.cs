@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using ZakatifyApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,20 @@ builder.Services.AddRateLimiter(options =>
         opt.Window = TimeSpan.FromMinutes(1);
         opt.QueueLimit = 0;
     });
+
+    options.AddFixedWindowLimiter("chat-ask", opt =>
+    {
+        opt.PermitLimit = 10;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("chat-list", opt =>
+    {
+        opt.PermitLimit = 30;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
 });
 
 // Configure JWT authentication using Supabase JWT secret
@@ -69,6 +84,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+// Register ChatService
+builder.Services.AddSingleton<ChatService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
